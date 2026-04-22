@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Complaint System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <h2 class="text-center mb-4 text-primary fw-bold">Complaint Management System</h2>
+
+    <!-- Form -->
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card p-4 shadow-lg rounded-4">
+                <h4>Add Complaint</h4>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <input type="text" name="name" class="form-control mb-2" placeholder="Enter Name" required>
+
+                    <select name="area" class="form-control mb-2" required>
+                        <option value="" disabled selected>Select Area</option>
+                        <option>Ghatlodiya</option>
+                        <option>Satellite</option>
+                        <option>Bopal</option>
+                        <option>Science City</option>
+                        <option>Chandlodiya</option>
+                        <option>Gota</option>
+                        <option>New Ranip</option>
+                    </select>
+
+                    <textarea name="desc" class="form-control mb-2" placeholder="Enter Complaint" required></textarea>
+
+                    <button class="btn btn-primary w-100 fw-bold">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <table class="table table-bordered mt-5 text-center align-middle">
+        <tr>
+            <th>Name</th>
+            <th>Area</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+
+        {% if data %}
+        {% for c in data %}
+
+        <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.area }}</td>
+
+            <td>
+                {% if c.status == "Pending" %}
+                    <span class="badge bg-warning">Pending</span>
+                {% else %}
+                    <span class="badge bg-success">Solved</span>
+                {% endif %}
+            </td>
+
+            <td>
+                <button class="btn btn-primary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#editModal{{ c.id }}">
+                    Edit
+                </button>
+
+                <a href="/delete/{{ c.id }}" class="btn btn-danger btn-sm">Delete</a>
+            </td>
+        </tr>
+
+        <!-- ✅ Modal (correct place) -->
+        <div class="modal fade" id="editModal{{ c.id }}" tabindex="-1">
+          <div class="modal-dialog">
+            <div class="modal-content">
+
+              <div class="modal-header">
+                <h5 class="modal-title">Edit Complaint</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+              </div>
+
+              <form method="POST" action="/edit/{{ c.id }}/">
+                {% csrf_token %}
+
+                <div class="modal-body">
+
+                  <input type="text" name="name" value="{{ c.name }}" class="form-control mb-2">
+
+                  <select name="area" class="form-control mb-2">
+                      <option value="Ghatlodiya" {% if c.area == "Ghatlodiya" %}selected{% endif %}>Ghatlodiya</option>
+                      <option value="Satellite" {% if c.area == "Satellite" %}selected{% endif %}>Satellite</option>
+                      <option value="Bopal" {% if c.area == "Bopal" %}selected{% endif %}>Bopal</option>
+                      <option value="Science City" {% if c.area == "Science City" %}selected{% endif %}>Science City</option>
+                      <option value="Chandlodiya" {% if c.area == "Chandlodiya" %}selected{% endif %}>Chandlodiya</option>
+                      <option value="Gota" {% if c.area == "Gota" %}selected{% endif %}>Gota</option>
+                      <option value="New Ranip" {% if c.area == "New Ranip" %}selected{% endif %}>New Ranip</option>
+                  </select>
+
+                  <textarea name="desc" class="form-control mb-2">{{ c.description }}</textarea>
+
+                  <select name="status" class="form-control mb-2">
+                      <option value="Pending" {% if c.status == "Pending" %}selected{% endif %}>Pending</option>
+                      <option value="Solved" {% if c.status == "Solved" %}selected{% endif %}>Solved</option>
+                  </select>
+
+                </div>
+
+                <div class="modal-footer">
+                  <button class="btn btn-success">Save Changes</button>
+                </div>
+
+              </form>
+
+            </div>
+          </div>
+        </div>
+
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="4">No complaints found</td>
+        </tr>
+        {% endif %}
+    </table>
+
+</div>
+
+<!-- ✅ Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
